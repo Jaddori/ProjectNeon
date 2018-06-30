@@ -218,6 +218,8 @@ MonoBehaviour:
   moveSpeed: 0.1
   playerCamera: {fileID: 20818103609279778, guid: d0a183f302cf1e840b49b930e233acf7,
     type: 2}
+  bulletPrefab: {fileID: 1747324184522066, guid: 31fe6175e13ec7b4897dea772a2bee8c,
+    type: 2}
 --- !u!136 &136854599796267924
 CapsuleCollider:
   m_ObjectHideFlags: 1

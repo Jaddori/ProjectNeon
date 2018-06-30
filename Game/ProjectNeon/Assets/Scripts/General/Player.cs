@@ -11,6 +11,9 @@ public class Player : NetworkBehaviour
 	[SerializeField]
 	public Camera playerCamera;
 
+	[SerializeField]
+	public GameObject bulletPrefab;
+
 	[SyncVar( hook = "StateChangedOnServer" )]
 	public PlayerState state;
 
@@ -37,6 +40,18 @@ public class Player : NetworkBehaviour
 			Camera.main.gameObject.SetActive( false );
 
 			Camera.Instantiate( playerCamera );
+		}
+	}
+
+	private void Update()
+	{
+		if( isLocalPlayer )
+		{
+			if( Input.GetMouseButtonDown( 0 ) )
+			{
+				Debug.Log( "SHOULD SHOOT" );
+				CmdShootOnServer();
+			}
 		}
 	}
 
@@ -71,7 +86,7 @@ public class Player : NetworkBehaviour
 
 		if( Input.GetKey( KeyCode.Space ) )
 			space = 1;
-		
+
 		var screenWidth = Screen.width;
 		var screenHeight = Screen.height;
 
@@ -100,14 +115,16 @@ public class Player : NetworkBehaviour
 		var mouseY = normalizedMouseY;
 
 		PlayerInput result = null;
-		if( w > 0 || a > 0 || s > 0 || d > 0 || space > 0 || !Mathf.Approximately( mouseX, _prevNormalizedMouseX ) || !Mathf.Approximately( mouseY, _prevNormalizedMouseY ) )
+		if( w > 0 || a > 0 || s > 0 || d > 0 || space > 0 ||
+			!Mathf.Approximately( mouseX, _prevNormalizedMouseX ) ||
+			!Mathf.Approximately( mouseY, _prevNormalizedMouseY ) )
 		{
 			result = new PlayerInput()
 			{
 				w = w, a = a, s = s, d = d,
 				space = space,
 				mouseX = mouseX,
-				mouseY = mouseY
+				mouseY = mouseY,
 			};
 
 			_prevNormalizedMouseX = mouseX;
@@ -124,10 +141,7 @@ public class Player : NetworkBehaviour
 		var x = input.d - input.a;
 		var z = input.w - input.s;
 		newPosition += new Vector3( x, 0, z ).normalized * moveSpeed;
-
-		if( isLocalPlayer )
-			Debug.Log( "X: " + x.ToString() + " - Z: " + z.ToString() );
-
+		
 		var angle = Mathf.Atan2( input.mouseY, input.mouseX ) * Mathf.Rad2Deg;
 		angle = -angle + 90.0f;
 
@@ -175,6 +189,18 @@ public class Player : NetworkBehaviour
 	private void CmdMoveOnServer( PlayerInput input )
 	{
 		state = ProcessPlayerInput( state, input );
+	}
+
+	[Command]
+	private void CmdShootOnServer()
+	{
+		var forward = (transform.rotation * Vector3.forward).normalized;
+
+		var bullet = Instantiate( bulletPrefab, transform.position + forward*2.0f, Quaternion.identity );
+		var rigidbody = bullet.GetComponent<Rigidbody>();
+		rigidbody.AddForce( forward * 15.0f, ForceMode.Impulse );
+
+		NetworkServer.Spawn( bullet.gameObject );
 	}
 
 	private void StateChangedOnServer( PlayerState newState )
