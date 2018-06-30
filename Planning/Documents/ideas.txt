@@ -1,0 +1,9 @@
+-Start as a white color
+-Level up your preferred color
+
+-You take damage based on what color you are
+-Enemies do the same
+-You fire projectiles the same color as you are
+
+-Progression tree for different colors provide different abilities
+-Combine colors with your friends

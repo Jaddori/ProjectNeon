@@ -1,3 +1,2 @@
 TileSystem
-ClassSystem
 ColorSystem
