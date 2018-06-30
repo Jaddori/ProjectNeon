@@ -2,4 +2,5 @@
 {
 	public byte w, a, s, d;
 	public byte space;
+	public float mouseX, mouseY;
 }

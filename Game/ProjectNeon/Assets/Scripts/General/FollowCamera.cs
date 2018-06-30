@@ -29,14 +29,20 @@ public class FollowCamera : MonoBehaviour
 	{
 		if( _player != null )
 		{
-			Vector3 playerPosition = _player.transform.position;
-			Vector3 playerForward = _player.transform.forward;
+			//Vector3 playerPosition = _player.transform.position;
+			//Vector3 playerForward = _player.transform.forward;
+			//
+			//Vector3 newPosition = playerPosition - playerForward * distance;
+			//newPosition.y = height;
+			//
+			//transform.position = newPosition;
+			//transform.rotation = Quaternion.LookRotation( playerPosition - newPosition );
 
-			Vector3 newPosition = playerPosition - playerForward * distance;
-			newPosition.y = height;
+			var playerPosition = _player.transform.position;
+			var relativePosition = new Vector3( 0, -height, distance );
 
-			transform.position = newPosition;
-			transform.rotation = Quaternion.LookRotation( playerPosition - newPosition );
+			transform.position = playerPosition - relativePosition;
+			transform.rotation = Quaternion.LookRotation( playerPosition - transform.position );
 		}
 	}
 }

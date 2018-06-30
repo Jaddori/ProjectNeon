@@ -97,8 +97,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ef92895d4680fc45a585ea55507fd48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  height: 2
-  distance: 5
+  height: 15
+  distance: 10
 --- !u!124 &124867804584031636
 Behaviour:
   m_ObjectHideFlags: 1

@@ -16,6 +16,7 @@ public class Player : NetworkBehaviour
 
 	private PlayerState _predictedState;
 	private List<PlayerInput> _pendingInput;
+	private float _prevNormalizedMouseX, _prevNormalizedMouseY;
 
 	private void Awake()
 	{
@@ -32,6 +33,7 @@ public class Player : NetworkBehaviour
 		if( isLocalPlayer )
 		{
 			_pendingInput = new List<PlayerInput>();
+			_prevNormalizedMouseX = _prevNormalizedMouseY = 0.0f;
 			Camera.main.gameObject.SetActive( false );
 
 			Camera.Instantiate( playerCamera );
@@ -69,11 +71,49 @@ public class Player : NetworkBehaviour
 
 		if( Input.GetKey( KeyCode.Space ) )
 			space = 1;
+		
+		var screenWidth = Screen.width;
+		var screenHeight = Screen.height;
+
+		var boundMouseX = Input.mousePosition.x;
+		if( boundMouseX < 0 )
+			boundMouseX = 0;
+		else if( boundMouseX > screenWidth )
+			boundMouseX = screenWidth;
+
+		var boundMouseY = Input.mousePosition.y;
+		if( boundMouseY < 0 )
+			boundMouseY = 0;
+		else if( boundMouseY > screenHeight )
+			boundMouseY = screenHeight;
+
+		var normalizedMouseX = boundMouseX / screenWidth;
+		var normalizedMouseY = boundMouseY / screenHeight;
+
+		normalizedMouseX *= 2.0f;
+		normalizedMouseX -= 1.0f;
+
+		normalizedMouseY *= 2.0f;
+		normalizedMouseY -= 1.0f;
+
+		var mouseX = normalizedMouseX;
+		var mouseY = normalizedMouseY;
 
 		PlayerInput result = null;
-		if( w > 0 || a > 0 || s > 0 || d > 0 || space > 0 )
-			result = new PlayerInput() { w = w, a = a, s = s, d = d, space = space };
+		if( w > 0 || a > 0 || s > 0 || d > 0 || space > 0 || !Mathf.Approximately( mouseX, _prevNormalizedMouseX ) || !Mathf.Approximately( mouseY, _prevNormalizedMouseY ) )
+		{
+			result = new PlayerInput()
+			{
+				w = w, a = a, s = s, d = d,
+				space = space,
+				mouseX = mouseX,
+				mouseY = mouseY
+			};
 
+			_prevNormalizedMouseX = mouseX;
+			_prevNormalizedMouseY = mouseY;
+		}
+		
 		return result;
 	}
 
@@ -83,17 +123,19 @@ public class Player : NetworkBehaviour
 
 		var x = input.d - input.a;
 		var z = input.w - input.s;
-		Vector3 movement = new Vector3( x, 0, z ).normalized * moveSpeed;
+		newPosition += new Vector3( x, 0, z ).normalized * moveSpeed;
 
-		Quaternion rotation = transform.rotation;
-		newPosition += rotation * Vector3.right * movement.x;
-		newPosition += rotation * Vector3.forward * movement.z;
+		if( isLocalPlayer )
+			Debug.Log( "X: " + x.ToString() + " - Z: " + z.ToString() );
+
+		var angle = Mathf.Atan2( input.mouseY, input.mouseX ) * Mathf.Rad2Deg;
+		angle = -angle + 90.0f;
 
 		var result = new PlayerState()
 		{
 			timestamp = prevState.timestamp + 1,
 			position = newPosition,
-			rotation = prevState.rotation
+			rotation = angle
 		};
 
 		return result;
@@ -104,16 +146,19 @@ public class Player : NetworkBehaviour
 		if( isServer )
 		{
 			transform.position = state.position;
+			transform.rotation = Quaternion.Euler(0, state.rotation, 0);
 		}
 		else
 		{
 			if( isLocalPlayer )
 			{
 				transform.position = _predictedState.position;
+				transform.rotation = Quaternion.Euler( 0, _predictedState.rotation, 0 );
 			}
 			else
 			{
 				transform.position = Vector3.Lerp( transform.position, state.position, 0.1f );
+				transform.rotation = Quaternion.Lerp( transform.rotation, Quaternion.Euler( 0, state.rotation, 0 ), 0.1f );
 			}
 		}
 	}
