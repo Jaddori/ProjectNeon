@@ -1,0 +1,20 @@
+alias(wall):
+w = 2,1,3
+
+alias(floor):
+f = 5
+
+room:
+layer(wall, walls):
+w,w,w,w,w,w,w
+w,0,0,0,0,0,w
+w,0,w,0,0,0,w
+w,0,0,0,0,0,w
+w,w,w,w,w,w,w
+
+layer(floor, floors):
+0,0,0,0,0,0,0
+0,f,f,f,f,f,0
+0,f,f,f,f,f,0
+0,f,f,f,f,f,0
+0,0,0,0,0,0,0
