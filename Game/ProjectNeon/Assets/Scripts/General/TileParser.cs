@@ -48,7 +48,6 @@ public class TileParser
 
 					var args = line.Substring( startIndex, endIndex - startIndex );
 					aliasType = args.Trim().ToLower();
-					Debug.Log( "Setting aliasType = " + aliasType );
 				}
 				else if( line == "room:" )
 				{

@@ -66,6 +66,6 @@ public class FloorAlias
 		var split = line.Split( new[] { "=" }, StringSplitOptions.RemoveEmptyEntries );
 
 		_name = split[0].Trim();
-		_part = int.Parse( split[1].Trim() );
+		_part = int.Parse( split[1].Trim() ) - 1;
 	}
 }
