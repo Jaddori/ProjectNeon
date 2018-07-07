@@ -49,7 +49,6 @@ public class Player : NetworkBehaviour
 		{
 			if( Input.GetMouseButtonDown( 0 ) )
 			{
-				Debug.Log( "SHOULD SHOOT" );
 				CmdShootOnServer();
 			}
 		}

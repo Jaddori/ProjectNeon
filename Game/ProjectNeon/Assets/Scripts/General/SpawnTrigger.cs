@@ -16,8 +16,6 @@ public class SpawnTrigger : MonoBehaviour
 
 	public void OnTriggerEnter( Collider other )
 	{
-		Debug.Log( "Entered trigger." );
-
 		_spawnerScript.Spawn();
 		gameObject.SetActive( false );
 	}

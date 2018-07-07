@@ -2,52 +2,125 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Networking;
 
-public class Enemy : MonoBehaviour
+public class Enemy : NetworkBehaviour
 {
 	private const float DISTANCE_MAX = 10.0f;
 	private const float DISTANCE_MIN = 4.5f;
 	private const float SPEED = 0.1f;
+	private const float TARGET_CONSIDERATION_DELAY = 5.0f;
+	private const float POSITION_THRESHOLD = 2.0f;
 
-	private GameObject _player;
+	private GameObject[] _players;
+	private GameObject _target;
 	private NavMeshAgent _navMeshAgent;
+	private float _targetConsiderationDelay;
 
-	private void Awake()
+	[SyncVar]
+	private EnemyState _state;
+
+	private void Start()
 	{
-		_player = GameObject.FindGameObjectWithTag( "Player" );
-		_navMeshAgent = GetComponent<NavMeshAgent>();
+		if( isServer )
+		{
+			_players = GameObject.FindGameObjectsWithTag( "Player" );
+
+			_navMeshAgent = GetComponent<NavMeshAgent>();
+			_targetConsiderationDelay = 0.0f;
+		}
 	}
 
 	private void Update()
 	{
-		var direction = ( _player.transform.position - transform.position );
-		var distance = direction.magnitude;
-
-		RaycastHit hitInfo;
-		var rayHit = Physics.Raycast( transform.position, direction.normalized, out hitInfo, distance );
-		var playerVisible = ( !rayHit || hitInfo.collider.gameObject == _player );
-
-		if( distance > DISTANCE_MAX )
-			_navMeshAgent.destination = _player.transform.position;
-		else if( distance < DISTANCE_MIN )
+		if( isServer )
 		{
-			if( playerVisible )
+			_targetConsiderationDelay -= Time.deltaTime;
+
+			// find the closest target
+			if( _targetConsiderationDelay <= 0 )
 			{
-				var backupDistance = DISTANCE_MIN - distance;
-				_navMeshAgent.destination = transform.position - direction * backupDistance;
+				_target = FindClosestPlayer();
+				_targetConsiderationDelay = TARGET_CONSIDERATION_DELAY;
 			}
-			else
-				_navMeshAgent.destination = _player.transform.position;
+
+			// move toward target
+			var direction = ( _target.transform.position - transform.position );
+			var distance = direction.magnitude;
+
+			RaycastHit hitInfo;
+			var rayHit = Physics.Raycast( transform.position, direction.normalized, out hitInfo, distance );
+			var playerVisible = ( !rayHit || hitInfo.collider.gameObject == _target );
+
+			if( distance > DISTANCE_MAX )
+				_navMeshAgent.destination = _target.transform.position;
+			else if( distance < DISTANCE_MIN )
+			{
+				if( playerVisible )
+				{
+					var backupDistance = DISTANCE_MIN - distance;
+					_navMeshAgent.destination = transform.position - direction * backupDistance;
+				}
+				else
+					_navMeshAgent.destination = _target.transform.position;
+			}
+			else // DISTANCE_MIN < distance < DISTANCE_MAX
+			{
+				if( playerVisible )
+				{
+					_navMeshAgent.isStopped = true;
+					_navMeshAgent.ResetPath();
+				}
+				else
+					_navMeshAgent.destination = _target.transform.position;
+			}
 		}
-		else // DISTANCE_MIN < distance < DISTANCE_MAX
+	}
+
+	private void FixedUpdate()
+	{
+		SyncState();
+	}
+
+	private GameObject FindClosestPlayer()
+	{
+		GameObject closestPlayer = null;
+		var closestDistance = float.MaxValue;
+		foreach( var player in _players )
 		{
-			if( playerVisible )
+			var distance = Vector3.Distance( player.transform.position, transform.position );
+			if( distance < closestDistance )
 			{
-				_navMeshAgent.isStopped = true;
-				_navMeshAgent.ResetPath();
+				closestPlayer = player;
+				closestDistance = distance;
+			}
+		}
+
+		return closestPlayer;
+	}
+
+	private void SyncState()
+	{
+		if( isServer )
+		{
+			_state = new EnemyState() { position = transform.position, rotation = 0.0f };
+			_state.rotation = transform.rotation.eulerAngles.y;
+		}
+		else
+		{
+			// if we're too far away from where we should be, just teleport
+			var positionDifference = Vector3.Distance( _state.position, transform.position );
+			if( positionDifference > POSITION_THRESHOLD )
+			{
+				transform.position = _state.position;
 			}
 			else
-				_navMeshAgent.destination = _player.transform.position;
+			{
+				transform.position = Vector3.Lerp( transform.position, _state.position, 0.1f );
+			}
+
+			var curAngle = transform.rotation.eulerAngles.y;
+			transform.rotation = Quaternion.Euler( 0, Mathf.LerpAngle( curAngle, _state.rotation, 0.1f ), 0 );
 		}
 	}
 }
