@@ -30,9 +30,16 @@ public class EnemySpawner : NetworkBehaviour
 		{
 			_hasSpawned = true;
 
+			var radialChunk = 360.0f / enemyCount;
+			var linearChunk = enemyCount*0.5f;
 			for( int i = 0; i < enemyCount; i++ )
 			{
-				var enemyInstance = Instantiate( enemy, transform.position, Quaternion.identity );
+				var curChunk = radialChunk * i * Mathf.Deg2Rad;
+				var position = new Vector3( Mathf.Cos( curChunk ), 0.0f, Mathf.Sin( curChunk ) ) * linearChunk;
+				position.y = 1.0f;
+
+				var enemyInstance = Instantiate( enemy, transform.position + position, Quaternion.identity );
+				//var enemyInstance = Instantiate( enemy, transform.position, Quaternion.identity );
 				NetworkServer.Spawn( enemyInstance );
 			}
 		}

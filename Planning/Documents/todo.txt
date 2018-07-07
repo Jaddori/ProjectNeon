@@ -1,5 +1,4 @@
 AI:
--Only raycast player visibility against scene geometry (i.e. not against bullets)
 
 Graphics:
 -Player graphics

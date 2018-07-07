@@ -16,7 +16,10 @@ public class SpawnTrigger : MonoBehaviour
 
 	public void OnTriggerEnter( Collider other )
 	{
-		_spawnerScript.Spawn();
-		gameObject.SetActive( false );
+		if( other.gameObject.tag == "Player" )
+		{
+			_spawnerScript.Spawn();
+			gameObject.SetActive( false );
+		}
 	}
 }

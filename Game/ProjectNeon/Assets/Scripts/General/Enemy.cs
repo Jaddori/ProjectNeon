@@ -49,7 +49,8 @@ public class Enemy : NetworkBehaviour
 			var distance = direction.magnitude;
 
 			RaycastHit hitInfo;
-			var rayHit = Physics.Raycast( transform.position, direction.normalized, out hitInfo, distance );
+			var ray = new Ray( transform.position, direction.normalized );
+			var rayHit = Physics.Raycast( ray, out hitInfo, distance, LayerMask.GetMask( "LevelGeometry" ) );
 			var playerVisible = ( !rayHit || hitInfo.collider.gameObject == _target );
 
 			if( distance > DISTANCE_MAX )
