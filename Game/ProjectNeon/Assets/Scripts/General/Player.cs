@@ -196,8 +196,8 @@ public class Player : NetworkBehaviour
 		var forward = (transform.rotation * Vector3.forward).normalized;
 
 		var bullet = Instantiate( bulletPrefab, transform.position + forward*2.0f, Quaternion.identity );
-		var rigidbody = bullet.GetComponent<Rigidbody>();
-		rigidbody.AddForce( forward * 15.0f, ForceMode.Impulse );
+		var bulletScript = bullet.GetComponent<Bullet>();
+		bulletScript.Shoot( forward, Bullet.BULLET_DEFAULT_SPEED, 1 );
 
 		NetworkServer.Spawn( bullet.gameObject );
 	}

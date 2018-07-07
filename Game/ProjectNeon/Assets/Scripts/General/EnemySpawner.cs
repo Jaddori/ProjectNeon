@@ -40,7 +40,7 @@ public class EnemySpawner : NetworkBehaviour
 
 				var enemyInstance = Instantiate( enemy, transform.position + position, Quaternion.identity );
 				//var enemyInstance = Instantiate( enemy, transform.position, Quaternion.identity );
-				NetworkServer.Spawn( enemyInstance );
+				NetworkServer.Spawn( enemyInstance.gameObject );
 			}
 		}
 	}

@@ -22,8 +22,9 @@ GameObject:
   - component: {fileID: 33319734984273234}
   - component: {fileID: 23748006327337560}
   - component: {fileID: 135286338604264152}
-  - component: {fileID: 54554890314246600}
   - component: {fileID: 114631555511615306}
+  - component: {fileID: 114774648054583154}
+  - component: {fileID: 54816509058506864}
   m_Layer: 0
   m_Name: Bullet
   m_TagString: Untagged
@@ -59,7 +60,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 6232c43ce6fd04c4abdc5c7b1664f1b6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -86,7 +87,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1747324184522066}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!54 &54554890314246600
+--- !u!54 &54816509058506864
 Rigidbody:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -95,8 +96,8 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_AngularDrag: 0
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -133,6 +134,17 @@ MonoBehaviour:
     i15: 140
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 0
+--- !u!114 &114774648054583154
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1747324184522066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dce089f28382e9e44997184c86641fe9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!135 &135286338604264152
 SphereCollider:
   m_ObjectHideFlags: 1

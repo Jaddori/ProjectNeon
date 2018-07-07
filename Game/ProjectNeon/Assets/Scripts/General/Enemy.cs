@@ -10,15 +10,20 @@ public class Enemy : NetworkBehaviour
 	private const float DISTANCE_MIN = 4.5f;
 	private const float SPEED = 0.1f;
 	private const float TARGET_CONSIDERATION_DELAY = 5.0f;
-	private const float POSITION_THRESHOLD = 2.0f;
+	private const float INTERPOLATE_THRESOLD = 2.0f;
 
 	private GameObject[] _players;
 	private GameObject _target;
 	private NavMeshAgent _navMeshAgent;
+	private TextMesh _healthText;
 	private float _targetConsiderationDelay;
-
+	private Vector3 _color;
+	
 	[SyncVar]
 	private EnemyState _state;
+
+	[SyncVar(hook = "HealthChangedOnServer")]
+	private float _health;
 
 	private void Start()
 	{
@@ -29,6 +34,16 @@ public class Enemy : NetworkBehaviour
 			_navMeshAgent = GetComponent<NavMeshAgent>();
 			_targetConsiderationDelay = 0.0f;
 		}
+
+		_color = new Vector3( 0, 1, 1 );
+		_health = 10;
+
+		//_healthText = GetComponent<TextMesh>();
+	}
+
+	private void Awake()
+	{
+		_healthText = GetComponentInChildren<TextMesh>();
 	}
 
 	private void Update()
@@ -111,7 +126,7 @@ public class Enemy : NetworkBehaviour
 		{
 			// if we're too far away from where we should be, just teleport
 			var positionDifference = Vector3.Distance( _state.position, transform.position );
-			if( positionDifference > POSITION_THRESHOLD )
+			if( positionDifference > INTERPOLATE_THRESOLD )
 			{
 				transform.position = _state.position;
 			}
@@ -123,5 +138,23 @@ public class Enemy : NetworkBehaviour
 			var curAngle = transform.rotation.eulerAngles.y;
 			transform.rotation = Quaternion.Euler( 0, Mathf.LerpAngle( curAngle, _state.rotation, 0.1f ), 0 );
 		}
+	}
+
+	// NOTE: This should only called by the server
+	public void TakeDamage( Vector3 color, float damage )
+	{
+		var fractor = Vector3.Dot( color, _color );
+		_health -= damage * fractor;
+
+		if( _health <= 0.0f )
+		{
+			NetworkServer.Destroy( gameObject );
+		}
+	}
+
+	private void HealthChangedOnServer( float newHealth )
+	{
+		var text = newHealth.ToString( "0.00" );
+		_healthText.text = text;
 	}
 }
