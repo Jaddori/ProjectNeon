@@ -9,6 +9,9 @@ public class Player : NetworkBehaviour
 	public float moveSpeed = 0.1f;
 
 	[SerializeField]
+	public float rushSpeed = 0.175f;
+
+	[SerializeField]
 	public Camera playerCamera;
 
 	[SerializeField]
@@ -72,7 +75,7 @@ public class Player : NetworkBehaviour
 
 	private PlayerInput GetPlayerInput()
 	{
-		byte w = 0, a = 0, s = 0, d = 0, space = 0;
+		byte w = 0, a = 0, s = 0, d = 0, space = 0, lshift = 0;
 
 		if( Input.GetKey( KeyCode.W ) )
 			w = 1;
@@ -85,6 +88,8 @@ public class Player : NetworkBehaviour
 
 		if( Input.GetKey( KeyCode.Space ) )
 			space = 1;
+		if( Input.GetKey( KeyCode.LeftShift ) )
+			lshift = 1;
 
 		var screenWidth = Screen.width;
 		var screenHeight = Screen.height;
@@ -114,7 +119,7 @@ public class Player : NetworkBehaviour
 		var mouseY = normalizedMouseY;
 
 		PlayerInput result = null;
-		if( w > 0 || a > 0 || s > 0 || d > 0 || space > 0 ||
+		if( w > 0 || a > 0 || s > 0 || d > 0 || space > 0 || lshift > 0 ||
 			!Mathf.Approximately( mouseX, _prevNormalizedMouseX ) ||
 			!Mathf.Approximately( mouseY, _prevNormalizedMouseY ) )
 		{
@@ -122,6 +127,7 @@ public class Player : NetworkBehaviour
 			{
 				w = w, a = a, s = s, d = d,
 				space = space,
+				lshift = lshift,
 				mouseX = mouseX,
 				mouseY = mouseY,
 			};
@@ -137,9 +143,11 @@ public class Player : NetworkBehaviour
 	{
 		Vector3 newPosition = prevState.position;
 
+		var currentSpeed = ( input.lshift > 0 ? rushSpeed : moveSpeed );
+
 		var x = input.d - input.a;
 		var z = input.w - input.s;
-		newPosition += new Vector3( x, 0, z ).normalized * moveSpeed;
+		newPosition += new Vector3( x, 0, z ).normalized * currentSpeed;
 		
 		var angle = Mathf.Atan2( input.mouseY, input.mouseX ) * Mathf.Rad2Deg;
 		angle = -angle + 90.0f;

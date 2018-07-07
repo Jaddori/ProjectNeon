@@ -25,7 +25,7 @@ public class Bullet : NetworkBehaviour
 	{
 		_rigidbody = GetComponent<Rigidbody>();
 		_enemyLayer = LayerMask.NameToLayer( "Enemies" );
-		_color = new Vector3( 0, 0, 1 );
+		_color = new Vector3( 0, 1, 1 );
 	}
 
 	private void FixedUpdate()
