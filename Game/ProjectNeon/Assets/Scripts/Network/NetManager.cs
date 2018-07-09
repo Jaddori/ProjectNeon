@@ -15,14 +15,20 @@ public class NetManager : NetworkManager
 	public Dictionary<int, string> playerNames = new Dictionary<int, string>();
 	public Dictionary<int, GameObject> players = new Dictionary<int, GameObject>();
 
-	public void Host()
+	private string _playerName;
+
+	public void Host( string playerName )
 	{
+		_playerName = playerName;
+
 		networkPort = 7777;
 		StartHost();
 	}
 
-	public void Join( string ip )
+	public void Join( string ip, string playerName )
 	{
+		_playerName = playerName;
+
 		networkAddress = ip;
 		networkPort = 7777;
 		StartClient();
@@ -31,8 +37,8 @@ public class NetManager : NetworkManager
 	public override void OnClientConnect( NetworkConnection conn )
 	{
 		base.OnClientConnect( conn );
-
-		conn.Send( SetName, new NameMessage() { name = "Bojangles" } );
+		
+		conn.Send( SetName, new NameMessage() { name = _playerName } );
 	}
 
 	public override void OnServerConnect( NetworkConnection conn )
@@ -46,8 +52,6 @@ public class NetManager : NetworkManager
 	{
 		var name = message.reader.ReadString();
 		var connId = message.conn.connectionId;
-
-		Debug.LogError( "Setting name " + name + " to connId " + connId.ToString() );
 
 		if( !playerNames.ContainsKey( connId ) )
 		{
