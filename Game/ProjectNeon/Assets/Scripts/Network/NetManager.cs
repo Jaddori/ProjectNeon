@@ -13,6 +13,7 @@ public class NetManager : NetworkManager
 	public const short SetName = 50;
 
 	public Dictionary<int, string> playerNames = new Dictionary<int, string>();
+	public Dictionary<int, GameObject> players = new Dictionary<int, GameObject>();
 
 	public void Host()
 	{
@@ -51,6 +52,22 @@ public class NetManager : NetworkManager
 		if( !playerNames.ContainsKey( connId ) )
 		{
 			playerNames.Add( connId, name );
+		}
+	}
+
+	public override void OnServerAddPlayer( NetworkConnection conn, short playerControllerId )
+	{
+		var player = Instantiate( playerPrefab, transform.position, Quaternion.identity );
+		NetworkServer.AddPlayerForConnection( conn, player, playerControllerId );
+
+		var connId = conn.connectionId;
+		if( playerNames.ContainsKey( connId ) )
+		{
+			var playerScript = player.GetComponent<Player>();
+			var name = playerNames[connId];
+			playerScript.playerName = name;
+
+			players.Add( connId, player );
 		}
 	}
 }

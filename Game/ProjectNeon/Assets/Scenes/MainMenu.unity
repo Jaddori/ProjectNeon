@@ -409,7 +409,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 307632439}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a08e5badc47a423469aa8e47452e164b, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ccfa92fc4b8f904aa044aead9a7cf03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_NetworkPort: 7777
@@ -871,8 +871,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bcb4727c4008a64c8c4cf4f150cf147, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  netClient: {fileID: 0}
-  netServer: {fileID: 307632440}
+  netManager: {fileID: 307632440}
   mainMenu: {fileID: 557949095}
   lobby: {fileID: 626340531}
   joinMenu: {fileID: 1546482411}

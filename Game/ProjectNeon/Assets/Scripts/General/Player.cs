@@ -17,12 +17,18 @@ public class Player : NetworkBehaviour
 	[SerializeField]
 	public GameObject bulletPrefab;
 
+	public Vector3 nameLabelRotation;
+
 	[SyncVar( hook = "StateChangedOnServer" )]
 	public PlayerState state;
+
+	[SyncVar( hook = "PlayerNameChangedOnServer" )]
+	public string playerName;
 
 	private PlayerState _predictedState;
 	private List<PlayerInput> _pendingInput;
 	private float _prevNormalizedMouseX, _prevNormalizedMouseY;
+	private TextMesh _nameLabel;
 
 	private void Awake()
 	{
@@ -44,6 +50,10 @@ public class Player : NetworkBehaviour
 
 			Camera.Instantiate( playerCamera );
 		}
+
+		_nameLabel = GetComponentInChildren<TextMesh>();
+		if( !string.IsNullOrEmpty( playerName ) )
+			_nameLabel.text = playerName;
 	}
 
 	private void Update()
@@ -71,6 +81,9 @@ public class Player : NetworkBehaviour
 		}
 
 		SyncState();
+
+		// reset the rotation of the name label
+		_nameLabel.transform.rotation = Quaternion.Euler( nameLabelRotation );
 	}
 
 	private PlayerInput GetPlayerInput()
@@ -222,5 +235,13 @@ public class Player : NetworkBehaviour
 
 			UpdatePredictedState();
 		}
+	}
+
+	private void PlayerNameChangedOnServer( string newName )
+	{
+		playerName = newName;
+
+		if( _nameLabel != null )
+			_nameLabel.text = playerName;
 	}
 }
