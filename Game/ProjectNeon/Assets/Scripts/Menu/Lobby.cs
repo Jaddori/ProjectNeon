@@ -2,22 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 public class Lobby : MonoBehaviour
 {
 	public Text[] playerLabels;
-	private string[] playerNames;
 
-	public void UpdatePlayerLabels()
+	private string[] _playerNames;
+	private int _currentPlayer;
+
+	private void Start()
 	{
-		if( playerNames == null )
-		{
-			playerNames = new string[] { "Bojangles", string.Empty, string.Empty, string.Empty };
-		}
+		_playerNames = new string[4];
+		_currentPlayer = 0;
+	}
 
-		for( int i = 0; i < playerLabels.Length; i++ )
+	public void AddPlayer( string name )
+	{
+		_playerNames[_currentPlayer] = name;
+		_currentPlayer++;
+
+		UpdateLabels();
+	}
+
+	public void UpdateLabels()
+	{
+		for( int i = 0; i < _currentPlayer; i++ )
 		{
-			playerLabels[i].text = playerNames[i];
+			playerLabels[i].text = _playerNames[i];
 		}
 	}
 }
