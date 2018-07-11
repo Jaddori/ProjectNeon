@@ -13,9 +13,10 @@ public class Player : NetworkBehaviour
 
 	[SerializeField]
 	public Camera playerCamera;
-
+	
 	[SerializeField]
 	public GameObject bulletPrefab;
+	public GameObject bulletRayPrefab;
 
 	public Vector3 nameLabelRotation;
 
@@ -29,6 +30,8 @@ public class Player : NetworkBehaviour
 	private List<PlayerInput> _pendingInput;
 	private float _prevNormalizedMouseX, _prevNormalizedMouseY;
 	private TextMesh _nameLabel;
+	private Vector3 _color;
+	private float _damage;
 
 	private CharacterController _controller;
 
@@ -58,6 +61,9 @@ public class Player : NetworkBehaviour
 		_nameLabel = GetComponentInChildren<TextMesh>();
 		if( !string.IsNullOrEmpty( playerName ) )
 			_nameLabel.text = playerName;
+
+		_color = new Vector3( 0, 0, 1 );
+		_damage = 1.0f;
 	}
 
 	private void Update()
@@ -67,6 +73,20 @@ public class Player : NetworkBehaviour
 			if( Input.GetMouseButtonDown( 0 ) )
 			{
 				CmdShootOnServer();
+
+				var forward = ( transform.rotation * Vector3.forward ).normalized;
+
+				var start = _predictedState.position;
+				var end = start + forward * 100.0f;
+
+				var ray = new Ray( start, forward );
+				RaycastHit hitInfo;
+				if( Physics.Raycast( ray, out hitInfo, 100.0f, LayerMask.GetMask( "LevelGeometry", "Enemies" ) ) )
+					end = hitInfo.point;
+
+				var bulletRay = Instantiate( bulletRayPrefab );
+				var bulletRayScript = bulletRay.GetComponent<BulletRay>();
+				bulletRayScript.Spawn( start, end, 0.35f, new Color( _color.x, _color.y, _color.z ) );
 			}
 		}
 	}
@@ -229,11 +249,15 @@ public class Player : NetworkBehaviour
 	{
 		var forward = (transform.rotation * Vector3.forward).normalized;
 
-		var bullet = Instantiate( bulletPrefab, transform.position + forward*2.0f, Quaternion.identity );
-		var bulletScript = bullet.GetComponent<Bullet>();
-		bulletScript.Shoot( forward, Bullet.BULLET_DEFAULT_SPEED, 1 );
+		var ray = new Ray( state.position, forward );
+		RaycastHit hitInfo;
+		if( Physics.Raycast( ray, out hitInfo, 100.0f, LayerMask.GetMask( "Enemies" ) ) )
+		{
+			var enemy = hitInfo.collider.gameObject;
+			var enemyScript = enemy.GetComponent<Enemy>();
 
-		NetworkServer.Spawn( bullet.gameObject );
+			enemyScript.TakeDamage( _color, _damage );
+		}
 	}
 
 	private void StateChangedOnServer( PlayerState newState )

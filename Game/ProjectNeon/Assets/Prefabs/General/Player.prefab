@@ -309,6 +309,8 @@ MonoBehaviour:
     type: 2}
   bulletPrefab: {fileID: 1747324184522066, guid: 31fe6175e13ec7b4897dea772a2bee8c,
     type: 2}
+  bulletRayPrefab: {fileID: 1194852415824076, guid: a08bab94fd5aa214c9b49dd6b1bed3a2,
+    type: 2}
   nameLabelRotation: {x: 45, y: 0, z: 0}
   playerName: 
 --- !u!136 &136854599796267924
