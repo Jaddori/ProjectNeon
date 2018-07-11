@@ -30,6 +30,8 @@ public class Player : NetworkBehaviour
 	private float _prevNormalizedMouseX, _prevNormalizedMouseY;
 	private TextMesh _nameLabel;
 
+	private CharacterController _controller;
+
 	private void Awake()
 	{
 		state = new PlayerState()
@@ -50,6 +52,8 @@ public class Player : NetworkBehaviour
 
 			Camera.Instantiate( playerCamera );
 		}
+
+		_controller = GetComponent<CharacterController>();
 
 		_nameLabel = GetComponentInChildren<TextMesh>();
 		if( !string.IsNullOrEmpty( playerName ) )
@@ -161,6 +165,11 @@ public class Player : NetworkBehaviour
 		var x = input.d - input.a;
 		var z = input.w - input.s;
 		newPosition += new Vector3( x, 0, z ).normalized * currentSpeed;
+
+		var prevPosition = transform.position;
+		_controller.Move( newPosition - prevPosition );
+		newPosition = transform.position;
+		transform.position = prevPosition;
 		
 		var angle = Mathf.Atan2( input.mouseY, input.mouseX ) * Mathf.Rad2Deg;
 		angle = -angle + 90.0f;
@@ -179,14 +188,18 @@ public class Player : NetworkBehaviour
 	{
 		if( isServer )
 		{
-			transform.position = state.position;
-			transform.rotation = Quaternion.Euler(0, state.rotation, 0);
+			var motion = state.position - transform.position;
+			_controller.Move( motion );
+
+			transform.rotation = Quaternion.Euler( 0, state.rotation, 0 );
 		}
 		else
 		{
 			if( isLocalPlayer )
 			{
-				transform.position = _predictedState.position;
+				var motion = _predictedState.position - transform.position;
+				_controller.Move( motion );
+
 				transform.rotation = Quaternion.Euler( 0, _predictedState.rotation, 0 );
 			}
 			else

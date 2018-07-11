@@ -4,3 +4,6 @@ Graphics:
 
 Combat:
 -Color system
+
+Movement:
+-Use rigidbody physics so we can't walk through walls
