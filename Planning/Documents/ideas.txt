@@ -7,3 +7,12 @@
 
 -Progression tree for different colors provide different abilities
 -Combine colors with your friends
+
+MVP:
+-Three players
+-Red, Green, Blue
+-No classes
+-Can't change color
+-Enemies change color
+-Players can combine colors to defeat enemies
+-Everyone can heal, buff, tank, etc

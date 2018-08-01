@@ -544,7 +544,7 @@ GameObject:
   - component: {fileID: 307632440}
   m_Layer: 0
   m_Name: Network Manager
-  m_TagString: Untagged
+  m_TagString: NetManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -574,7 +574,7 @@ MonoBehaviour:
   m_AutoCreatePlayer: 1
   m_PlayerSpawnMethod: 0
   m_OfflineScene: 
-  m_OnlineScene: Sandbox
+  m_OnlineScene: Lobby
   m_SpawnPrefabs:
   - {fileID: 1747324184522066, guid: 31fe6175e13ec7b4897dea772a2bee8c, type: 2}
   - {fileID: 1202485535380222, guid: bbade8b3b68612c44a45bb972ee33344, type: 2}
